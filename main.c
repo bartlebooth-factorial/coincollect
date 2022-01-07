@@ -11,6 +11,9 @@ int main()
 {
     int ypos, xpos, ycoin, xcoin, yscore, xscore;
     int ystep, xstep, score, ch;
+    int coins[20];
+    int nthcoin, i;
+    int newycoin, newxcoin;
 
     initscr();
     cbreak();
@@ -37,6 +40,10 @@ int main()
     ycoin = 5;
     xcoin = 10;
 
+    coins[0] = ycoin;
+    coins[1] = xcoin;
+    nthcoin = 0;
+
     move(ycoin, xcoin);
     printcoin();
 
@@ -55,10 +62,26 @@ int main()
         move(ypos, xpos);
         printw("&");
 
-        /* print coin only when user is not on the coin's position */
-        if (ypos != ycoin || xpos != xcoin) {
-            move(ycoin, xcoin);
-            printcoin();
+        /* add coin */
+        nthcoin += 2;
+
+        newycoin = 10 + nthcoin;
+        newxcoin = 10 + nthcoin;
+
+        coins[nthcoin] = newycoin;
+        coins[nthcoin] = newxcoin;
+
+        /* display coins */
+        for (i=0; i<=nthcoin; i+=2) {
+
+            ycoin = coins[i];
+            xcoin = coins[i+1];
+
+            /* print coin only when user is not on the coin's position */
+            if (ypos != ycoin || xpos != xcoin) {
+                move(ycoin, xcoin);
+                printcoin();
+            }
         }
 
         move(yscore, xscore);
@@ -90,8 +113,13 @@ int main()
             return 0;
         }
 
-        if (ypos==ycoin && xpos==xcoin)
-            ++score;
+        for (i=0; i<=nthcoin; i+=2) {
+            ycoin = coins[i];
+            xcoin = coins[i+1];
+
+            if (ypos==ycoin && xpos==xcoin)
+                ++score;
+        }
     }
 
     endwin();
