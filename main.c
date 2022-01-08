@@ -65,8 +65,8 @@ int main()
         /* add coin */
         nthcoin += 2;
 
-        newycoin = 10 + nthcoin;
-        newxcoin = 10 + nthcoin;
+        newycoin = 5 + ((nthcoin / 2 * 5)); /* must be a multiple of 5 */
+        newxcoin = 5 + ((nthcoin / 2) * 10); /* must be a multiple of 10 */
 
         coins[nthcoin] = newycoin;
         coins[nthcoin] = newxcoin;
