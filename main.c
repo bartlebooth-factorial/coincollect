@@ -12,7 +12,7 @@ int main()
 {
     int ypos, xpos, ycoin, xcoin, yscore, xscore;
     int ystep, xstep, score, ch;
-    int coins[20];
+    int coins[80];
     int nthcoin, i;
     int newycoin, newxcoin;
     int rounds;
@@ -58,7 +58,7 @@ int main()
 
     score = 0;
 
-    for (rounds=0; rounds<10; ++rounds)
+    for (rounds=0; rounds<40; ++rounds)
     {
         clear();
 
@@ -66,8 +66,8 @@ int main()
         printw("&");
 
         /* add coin */
-        newycoin = 5 * (rand() % 10); /* must be a multiple of 5 */
-        newxcoin = 10 * (rand() % 10); /* must be a multiple of 10 */
+        newycoin = 5 * (random() % 10); /* must be a multiple of 5 */
+        newxcoin = 10 * (random() % 10); /* must be a multiple of 10 */
 
         nthcoin += 2;
 
