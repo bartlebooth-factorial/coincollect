@@ -5,7 +5,7 @@
 #define printcoin() attron(A_BOLD); printw("*"); attroff(A_BOLD)
 
 /*
- * We have the initial character, now fix movement drawing
+ * disallow coins from spawning atop other coins
  */
 
 int main()
@@ -66,8 +66,8 @@ int main()
         printw("&");
 
         /* add coin */
-        newycoin = 5 + ((nthcoin / 2 * 5)); /* must be a multiple of 5 */
-        newxcoin = 10 + ((nthcoin / 2) * 10); /* must be a multiple of 10 */
+        newycoin = 5 * (rand() % 10); /* must be a multiple of 5 */
+        newxcoin = 10 * (rand() % 10); /* must be a multiple of 10 */
 
         nthcoin += 2;
 
