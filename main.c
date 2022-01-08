@@ -1,6 +1,7 @@
 #include <ncurses.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 
 #define printcoin() attron(A_BOLD); printw("*"); attroff(A_BOLD)
 
@@ -66,8 +67,8 @@ int main()
         printw("&");
 
         /* add coin */
-        newycoin = 5 * (random() % 10); /* must be a multiple of 5 */
-        newxcoin = 10 * (random() % 10); /* must be a multiple of 10 */
+        newycoin = 5 * (random() % 8); /* must be a multiple of 5 */
+        newxcoin = 10 * (random() % 8); /* must be a multiple of 10 */
 
         nthcoin += 2;
 
