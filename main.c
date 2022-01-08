@@ -1,4 +1,5 @@
 #include <ncurses.h>
+#include <stdlib.h>
 #include <stdio.h>
 
 #define printcoin() attron(A_BOLD); printw("*"); attroff(A_BOLD)
@@ -14,6 +15,7 @@ int main()
     int coins[20];
     int nthcoin, i;
     int newycoin, newxcoin;
+    int rounds;
 
     initscr();
     cbreak();
@@ -42,6 +44,7 @@ int main()
 
     coins[0] = ycoin;
     coins[1] = xcoin;
+
     nthcoin = 0;
 
     move(ycoin, xcoin);
@@ -55,7 +58,7 @@ int main()
 
     score = 0;
 
-    while (true)
+    for (rounds=0; rounds<10; ++rounds)
     {
         clear();
 
@@ -63,13 +66,13 @@ int main()
         printw("&");
 
         /* add coin */
+        newycoin = 5 + ((nthcoin / 2 * 5)); /* must be a multiple of 5 */
+        newxcoin = 10 + ((nthcoin / 2) * 10); /* must be a multiple of 10 */
+
         nthcoin += 2;
 
-        newycoin = 5 + ((nthcoin / 2 * 5)); /* must be a multiple of 5 */
-        newxcoin = 5 + ((nthcoin / 2) * 10); /* must be a multiple of 10 */
-
         coins[nthcoin] = newycoin;
-        coins[nthcoin] = newxcoin;
+        coins[nthcoin+1] = newxcoin;
 
         /* display coins */
         for (i=0; i<=nthcoin; i+=2) {
@@ -84,11 +87,12 @@ int main()
             }
         }
 
+        /* display score */
         move(yscore, xscore);
         printw("Score = %d", score);
 
+        /* handle input */
         ch = getch();
-
         switch (ch)
         {
         // h
@@ -110,7 +114,7 @@ int main()
         // q
         case 113:
             endwin();
-            return 0;
+            exit(0);
         }
 
         for (i=0; i<=nthcoin; i+=2) {
@@ -123,4 +127,5 @@ int main()
     }
 
     endwin();
+    exit(0);
 }

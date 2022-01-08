@@ -1,7 +1,7 @@
 install: coincollect
 
 coincollect:
-	gcc -lncurses main.c -o coincollect
+	cc -lncurses main.c -o coincollect
 
 clean:
 	rm coincollect
