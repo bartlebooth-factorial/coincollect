@@ -18,6 +18,8 @@ int main()
     int newycoin, newxcoin;
     int rounds;
 
+    srandom(time(NULL));
+
     initscr();
     cbreak();
     noecho();
@@ -127,6 +129,10 @@ int main()
         }
     }
 
+    clear();
+    move(10, 30);
+    printw("Score = %d", score);
+    getch();
     endwin();
     exit(0);
 }
