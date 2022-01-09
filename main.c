@@ -4,22 +4,30 @@
 #include <time.h>
 
 #define GRID 8
+#define YSTEP 3
+#define XSTEP 6
+#define YSCORE 1
+#define XSCORE 80
+#define YTURN 25
+#define XTURN 80
+#define TURNS 40
+#define COINS_PER_TURN 2
 #define UNLOCK_MAGIC 30
 
 /*
- * fix display_borders
+ * done
  */
 
 void curses_init(void);
-void display_borders(int ystep, int xstep);
+void display_borders(void);
 void display_player(int ypos, int xpos, int magic);
-void add_coin(int ystep, int xstep, int nthcoin, int *coins, int *coinvalidity);
+void add_coin(int nthcoin, int *coins, int *coinvalidity);
 void display_coins(int ypos, int xpos, int nthcoin, int *coins, int *coinvalidity);
-void display_midgame_score(int yscore, int xscore, int score);
-void display_turn(int yturn, int xturn, int turn);
-void movement(int ystep, int xstep, int *ypos, int *xpos, int magic, int *retry);
-void normal_bounds(int ystep, int xstep, int *ypos, int *xpos);
-void magic_bounds(int ystep, int xstep, int *ypos, int *xpos);
+void display_midgame_score(int score);
+void display_turn(int turn);
+void movement(int *ypos, int *xpos, int magic, int *retry);
+void normal_bounds(int *ypos, int *xpos);
+void magic_bounds(int *ypos, int *xpos);
 int collect(int ypos, int xpos, int nthcoin, int *coins, int * coinvalidity, int score);
 void display_score(int score, int totalscore, int games);
 
@@ -32,17 +40,17 @@ curses_init(void)
     curs_set(0);
 }
 
-void display_borders(int ystep, int xstep)
+void display_borders(void)
 {
     int i;
 
-    for (i=0; i<(GRID*xstep); i+=xstep)
-        mvaddch(ystep * GRID, i, '-');
+    for (i=0; i<(GRID*XSTEP); i+=XSTEP)
+        mvaddch(YSTEP * GRID, i, '-');
 
-    for (i=0; i<(GRID*ystep); i+=ystep)
-        mvaddch(i, xstep * GRID, '|');
+    for (i=0; i<(GRID*YSTEP); i+=YSTEP)
+        mvaddch(i, XSTEP * GRID, '|');
 
-    mvaddch(GRID*ystep, GRID*xstep, ';');
+    mvaddch(GRID*YSTEP, GRID*XSTEP, ';');
 }
 
 void
@@ -55,7 +63,7 @@ display_player(int ypos, int xpos, int magic)
 }
 
 void
-add_coin(int ystep, int xstep, int nthcoin, int *coins, int *coinvalidity)
+add_coin(int nthcoin, int *coins, int *coinvalidity)
 {
     int newycoin, newxcoin;
     int ycoin, xcoin;
@@ -65,8 +73,8 @@ add_coin(int ystep, int xstep, int nthcoin, int *coins, int *coinvalidity)
 
     while (true)
     {
-        newycoin = ystep * (random() % GRID);
-        newxcoin = xstep * (random() % GRID);
+        newycoin = YSTEP * (random() % GRID);
+        newxcoin = XSTEP * (random() % GRID);
 
         matches = 0;
         for (i=0; i<=nthcoin; i+=2)
@@ -107,21 +115,21 @@ display_coins(int ypos, int xpos, int nthcoin, int *coins, int *coinvalidity)
 }
 
 void
-display_midgame_score(int yscore, int xscore, int score)
+display_midgame_score(int score)
 {
-    move(yscore, xscore);
+    move(YSCORE, XSCORE);
     printw("Score = %d", score);
 }
 
 void
-display_turn(int yturn, int xturn, int turn)
+display_turn(int turn)
 {
-    move(yturn, xturn);
+    move(YTURN, XTURN);
     printw("turn %d of 40", turn);
 }
 
 void
-movement(int ystep, int xstep, int *ypos, int *xpos, int magic, int *retry)
+movement(int *ypos, int *xpos, int magic, int *retry)
 {
     int key;
 
@@ -131,29 +139,29 @@ movement(int ystep, int xstep, int *ypos, int *xpos, int magic, int *retry)
     // h & a
     case 104:
     case 97:
-        *xpos -= xstep;
+        *xpos -= XSTEP;
         break;
     // j & s
     case 106:
     case 115:
-        *ypos += ystep;
+        *ypos += YSTEP;
         break;
     // k & w
     case 107:
     case 119:
-        *ypos -= ystep;
+        *ypos -= YSTEP;
         break;
     // l & d
     case 108:
     case 100:
-        *xpos += xstep;
+        *xpos += XSTEP;
         break;
     // space
     case 32:
         if (magic)
         {
-            *ypos = ystep * (GRID / 2);
-            *xpos = xstep * (GRID / 2);
+            *ypos = YSTEP * (GRID / 2);
+            *xpos = XSTEP * (GRID / 2);
         }
         break;
     // r
@@ -168,7 +176,7 @@ movement(int ystep, int xstep, int *ypos, int *xpos, int magic, int *retry)
 }
 
 void
-normal_bounds(int ystep, int xstep, int *ypos, int *xpos)
+normal_bounds(int *ypos, int *xpos)
 {
     if (*ypos < 0)
         *ypos = 0;
@@ -176,26 +184,26 @@ normal_bounds(int ystep, int xstep, int *ypos, int *xpos)
     if (*xpos < 0)
         *xpos = 0;
 
-    if (*ypos > ystep * (GRID - 1))
-        *ypos = ystep * (GRID - 1);
+    if (*ypos > YSTEP * (GRID - 1))
+        *ypos = YSTEP * (GRID - 1);
 
-    if (*xpos > xstep * (GRID - 1))
-        *xpos = xstep * (GRID - 1);
+    if (*xpos > XSTEP * (GRID - 1))
+        *xpos = XSTEP * (GRID - 1);
 }
 
 void
-magic_bounds(int ystep, int xstep, int *ypos, int *xpos)
+magic_bounds(int *ypos, int *xpos)
 {
     if (*ypos < 0)
-        *ypos = ystep * (GRID - 1);
+        *ypos = YSTEP * (GRID - 1);
 
     if (*xpos < 0)
-        *xpos = xstep * (GRID - 1);
+        *xpos = XSTEP * (GRID - 1);
 
-    if (*ypos > ystep * (GRID - 1))
+    if (*ypos > YSTEP * (GRID - 1))
         *ypos = 0;
 
-    if (*xpos > xstep * (GRID - 1))
+    if (*xpos > XSTEP * (GRID - 1))
         *xpos = 0;
 }
 
@@ -239,9 +247,6 @@ int
 main(int argc, char *argv[])
 {
     int coins[160], coinvalidity[80];
-    int ystep, xstep;
-    int yscore, xscore, yturn, xturn;
-    int turns, coinsperturn;
     int magic;
     int games, totalscore;
     int ypos, xpos;
@@ -254,19 +259,6 @@ main(int argc, char *argv[])
 
     srandom(time(NULL));
 
-    ystep = 3;
-    xstep = 6;
-
-    yscore = 1;
-    xscore = 80;
-
-    yturn = 25;
-    xturn = 80;
-
-    turns = 40;
-
-    coinsperturn = 2;
-
     magic = 0;
 
     games = 0;
@@ -276,8 +268,8 @@ main(int argc, char *argv[])
 
     while (true)
     {
-        ypos = ystep * (GRID / 2);
-        xpos = xstep * (GRID / 2);
+        ypos = YSTEP * (GRID / 2);
+        xpos = XSTEP * (GRID / 2);
 
         nthcoin = -2; /* initial offset */
 
@@ -288,35 +280,35 @@ main(int argc, char *argv[])
 
         retry = 0;
 
-        for (turn=0; turn<turns; ++turn)
+        for (turn=0; turn<TURNS; ++turn)
         {
             clear();
 
-            display_borders(ystep, xstep);
+            display_borders();
 
             display_player(ypos, xpos, magic);
 
-            for (i=0; i<coinsperturn; ++i)
+            for (i=0; i<COINS_PER_TURN; ++i)
             {
                 nthcoin+=2;
-                add_coin(ystep, xstep, nthcoin, coins, coinvalidity);
+                add_coin(nthcoin, coins, coinvalidity);
             }
 
             display_coins(ypos, xpos, nthcoin, coins, coinvalidity);
 
-            display_midgame_score(yscore, xscore, score);
+            display_midgame_score(score);
 
-            display_turn(yturn, xturn, turn);
+            display_turn(turn);
 
-            movement(ystep, xstep, &ypos, &xpos, magic, &retry);
+            movement(&ypos, &xpos, magic, &retry);
 
             if (retry)
                 break;
 
             if (magic)
-                magic_bounds(ystep, xstep, &ypos, &xpos);
+                magic_bounds(&ypos, &xpos);
             else
-                normal_bounds(ystep, xstep, &ypos, &xpos);
+                normal_bounds(&ypos, &xpos);
 
             score = collect(ypos, xpos, nthcoin, coins, coinvalidity, score);
         }
