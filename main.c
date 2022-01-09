@@ -4,9 +4,10 @@
 #include <time.h>
 
 #define GRID 8
+#define UNLOCK_MAGIC 30
 
 /*
- * add unlocking condition for magic character
+ * draw borders
  */
 
 void curses_init(void);
@@ -227,12 +228,12 @@ main(int argc, char *argv[])
     int ystep, xstep;
     int yscore, xscore, yturn, xturn;
     int turns, coinsperturn;
+    int magic;
     int games, totalscore;
     int ypos, xpos;
     int nthcoin;
     int score;
     int retry;
-    int magic;
     int turn; 
     int i;
     int key, choice;
@@ -252,6 +253,8 @@ main(int argc, char *argv[])
 
     coinsperturn = 2;
 
+    magic = 0;
+
     games = 0;
     totalscore = 0;
 
@@ -270,8 +273,6 @@ main(int argc, char *argv[])
         score = 0;
 
         retry = 0;
-
-        magic = 1;
 
         for (turn=0; turn<turns; ++turn)
         {
@@ -311,6 +312,9 @@ main(int argc, char *argv[])
 
         totalscore += score;
         ++games;
+
+        if (score >= UNLOCK_MAGIC)
+            magic = 1;
 
         display_score(score, totalscore, games);
 
