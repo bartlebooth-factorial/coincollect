@@ -7,10 +7,11 @@
 #define UNLOCK_MAGIC 30
 
 /*
- * draw borders
+ * fix display_borders
  */
 
 void curses_init(void);
+void display_borders(int ystep, int xstep);
 void display_player(int ypos, int xpos, int magic);
 void add_coin(int ystep, int xstep, int nthcoin, int *coins, int *coinvalidity);
 void display_coins(int ypos, int xpos, int nthcoin, int *coins, int *coinvalidity);
@@ -29,6 +30,17 @@ curses_init(void)
     cbreak();
     noecho();
     curs_set(0);
+}
+
+void display_borders(int ystep, int xstep)
+{
+    int i;
+
+    for (i=0; i<GRID; i+=xstep)
+        mvaddch(ystep * GRID, i, '-');
+
+    for (i=0; i<GRID; i+=ystep)
+        mvaddch(i, xstep * GRID, '|');
 }
 
 void
@@ -277,6 +289,8 @@ main(int argc, char *argv[])
         for (turn=0; turn<turns; ++turn)
         {
             clear();
+
+            display_borders(ystep, xstep);
 
             display_player(ypos, xpos, magic);
 
