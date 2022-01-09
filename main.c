@@ -13,6 +13,7 @@ int main()
 {
     int ypos, xpos, ycoin, xcoin, yscore, xscore;
     int ystep, xstep, score, ch;
+    int backscore;
     int coins[80];
     int coinvalidity[40];
     int valid;
@@ -160,6 +161,8 @@ int main()
             {
                 ++score;
                 coinvalidity[i/2] = 0;
+                if (rounds < 40-1)
+                    ++backscore;
             }
         }
     }
