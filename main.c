@@ -4,9 +4,9 @@
 #include <time.h>
 
 /*
- * enable new coins to take the position of collected coins
  * add 2 coins per round
  * add magic character
+ * add avg score (static variable)
  */
 
 void curses_init(void);
@@ -31,11 +31,12 @@ main(int argc, char *argv[])
     int score;
     int backscore;
     int key, choice;
-    int coins[80];
-    int coinvalidity[40];
+    int coins[160];
+    int coinvalidity[80];
     int valid;
     int nthcoin;
     int i;
+    int newcoins, coinsperturn;
     int newycoin, newxcoin;
     int round, rounds;
     int matches;
@@ -65,6 +66,8 @@ main(int argc, char *argv[])
 
         rounds = 40;
 
+        coinsperturn = 2;
+
         score = 0;
 
         for (round=0; round<rounds; ++round)
@@ -74,32 +77,35 @@ main(int argc, char *argv[])
             /* display player */
             mvaddch(ypos, xpos, '&');
 
-            /* add coin */
-            nthcoin += 2;
-
-            while (true)
+            /* add coins */
+            for (newcoins=0; newcoins<coinsperturn; ++newcoins)
             {
-                newycoin = ystep * (random() % 8); /* must be a multiple of ystep */
-                newxcoin = xstep * (random() % 8); /* must be a multiple of xstep */
+                nthcoin += 2;
 
-                matches = 0;
-                for (i=0; i<=nthcoin; i+=2)
+                while (true)
                 {
-                    ycoin = coins[i];
-                    xcoin = coins[i+1];
-                    valid = coinvalidity[i/2];
+                    newycoin = ystep * (random() % 8); /* must be a multiple of ystep */
+                    newxcoin = xstep * (random() % 8); /* must be a multiple of xstep */
 
-                    if (ycoin==newycoin && xcoin==newxcoin && valid)
-                        matches += 1;
+                    matches = 0;
+                    for (i=0; i<=nthcoin; i+=2)
+                    {
+                        ycoin = coins[i];
+                        xcoin = coins[i+1];
+                        valid = coinvalidity[i/2];
+
+                        if (ycoin==newycoin && xcoin==newxcoin && valid)
+                            matches += 1;
+                    }
+
+                    if (matches==0)
+                        break;
                 }
 
-                if (matches==0)
-                    break;
+                coins[nthcoin] = newycoin;
+                coins[nthcoin+1] = newxcoin;
+                coinvalidity[nthcoin/2] = 1;
             }
-
-            coins[nthcoin] = newycoin;
-            coins[nthcoin+1] = newxcoin;
-            coinvalidity[nthcoin/2] = 1;
 
             /* display coins */
             for (i=0; i<=nthcoin; i+=2)
