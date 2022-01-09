@@ -3,10 +3,10 @@
 #include <stdio.h>
 #include <time.h>
 
-#define printcoin() attron(A_BOLD); printw("*"); attroff(A_BOLD)
-
 /*
- * fix score breaking on final turn
+ * enable new coins to take the position of collected coins
+ * add retry
+ * add 2 coins per round
  */
 
 int main()
@@ -20,7 +20,7 @@ int main()
     int nthcoin, i;
     int newycoin, newxcoin;
     int rounds;
-    int found, matches;
+    int matches;
 
     srandom(time(NULL));
 
@@ -43,28 +43,21 @@ int main()
      * - - - - - - - - - - - - - - - - - -
      */
 
-    ypos = 16;
-    xpos = 24;
+    ystep = 4;
+    xstep = 6;
 
-    //ycoin = 5;
-    //xcoin = 10;
-
-    //coins[0] = ycoin;
-    //coins[1] = xcoin;
+    ypos = ystep * 4;
+    xpos = xstep * 4;
 
     nthcoin = 0;
 
     for (i=0; i<40; i++)
         coinvalidity[i] = 1;
 
-    move(ycoin, xcoin);
-    printcoin();
 
     yscore = 1;
     xscore = 80;
 
-    ystep = 4;
-    xstep = 6;
 
     score = 0;
 
@@ -72,9 +65,7 @@ int main()
     {
         clear();
 
-        //move(ypos, xpos);
-        //printw("&");
-
+        /* display player */
         mvaddch(ypos, xpos, '&');
 
         /* add coin */
@@ -82,8 +73,8 @@ int main()
 
         while (true)
         {
-            newycoin = 4 * (random() % 8); /* must be a multiple of 5 */
-            newxcoin = 6 * (random() % 8); /* must be a multiple of 10 */
+            newycoin = ystep * (random() % 8); /* must be a multiple of ystep */
+            newxcoin = xstep * (random() % 8); /* must be a multiple of xstep */
 
             matches = 0;
             for (i=0; i<=nthcoin; i+=2)
@@ -99,11 +90,6 @@ int main()
                 break;
         }
 
-        //move(0, 0);
-        //printw("%d", newycoin);
-        //move(0, 4);
-        //printw("%d", newxcoin);
-
         coins[nthcoin] = newycoin;
         coins[nthcoin+1] = newxcoin;
 
@@ -118,7 +104,6 @@ int main()
             if ((ypos != ycoin || xpos != xcoin) && valid)
             {
                 mvaddch(ycoin, xcoin, '*');
-                //printcoin();
             }
         }
 
@@ -161,8 +146,6 @@ int main()
             {
                 ++score;
                 coinvalidity[i/2] = 0;
-                if (rounds < 40-1)
-                    ++backscore;
             }
         }
     }
