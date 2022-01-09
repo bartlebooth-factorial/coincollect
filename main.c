@@ -45,8 +45,8 @@ add_coin(int ystep, int xstep, int nthcoin, int *coins, int *coinvalidity)
 
     while (true)
     {
-        newycoin = ystep * ((random() % GRID) + 1);
-        newxcoin = xstep * ((random() % GRID + 1));
+        newycoin = ystep * (random() % GRID);
+        newxcoin = xstep * (random() % GRID);
 
         matches = 0;
         for (i=0; i<=nthcoin; i+=2)
@@ -232,17 +232,17 @@ main(int argc, char *argv[])
             }
 
             /* movement bounds */
-            if (ypos < ystep)
-                ypos = ystep;
+            if (ypos < 0)
+                ypos = 0;
 
-            if (xpos < xstep)
-                xpos = xstep;
+            if (xpos < 0)
+                xpos = 0;
 
-            if (ypos > ystep * GRID)
-                ypos = ystep * GRID;
+            if (ypos > ystep * (GRID - 1))
+                ypos = ystep * (GRID - 1);
 
-            if (xpos > xstep * GRID)
-                xpos = xstep * GRID;
+            if (xpos > xstep * (GRID - 1))
+                xpos = xstep * (GRID - 1);
 
             score = collect(ypos, xpos, nthcoin, coins, coinvalidity, score);
         }
