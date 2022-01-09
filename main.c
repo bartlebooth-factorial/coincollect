@@ -6,7 +6,6 @@
 #define GRID 8
 
 /*
- * add mid-round retry
  * add magic character
  */
 
@@ -16,6 +15,8 @@ void add_coin(int ystep, int xstep, int nthcoin, int *coins, int *coinvalidity);
 void display_coins(int ypos, int xpos, int nthcoin, int *coins, int *coinvalidity);
 void display_midgame_score(int yscore, int xscore, int score);
 void display_turn(int yturn, int xturn, int turn);
+void movement(int ystep, int xstep, int *ypos, int *xpos, int *retry);
+void enforce_bounds(int ystep, int xstep, int *ypos, int *xpos);
 int collect(int ypos, int xpos, int nthcoin, int *coins, int * coinvalidity, int score);
 void display_score(int score, int totalscore, int games);
 
@@ -100,6 +101,61 @@ display_turn(int yturn, int xturn, int turn)
     printw("turn %d of 40", turn);
 }
 
+void
+movement(int ystep, int xstep, int *ypos, int *xpos, int *retry)
+{
+    int key;
+
+    key = getch();
+    switch (key)
+    {
+    // h & a
+    case 104:
+    case 97:
+        *xpos -= xstep;
+        break;
+    // j & s
+    case 106:
+    case 115:
+        *ypos += ystep;
+        break;
+    // k & w
+    case 107:
+    case 119:
+        *ypos -= ystep;
+        break;
+    // l & d
+    case 108:
+    case 100:
+        *xpos += xstep;
+        break;
+    // r
+    case 114:
+        *retry = 1;
+        break;
+    // q
+    case 113:
+        endwin();
+        exit(0);
+    }
+}
+
+void
+enforce_bounds(int ystep, int xstep, int *ypos, int *xpos)
+{
+    if (*ypos < 0)
+        *ypos = 0;
+
+    if (*xpos < 0)
+        *xpos = 0;
+
+    if (*ypos > ystep * (GRID - 1))
+        *ypos = ystep * (GRID - 1);
+
+    if (*xpos > xstep * (GRID - 1))
+        *xpos = xstep * (GRID - 1);
+}
+
 int
 collect(int ypos, int xpos, int nthcoin, int *coins, int * coinvalidity, int score)
 {
@@ -147,6 +203,7 @@ main(int argc, char *argv[])
     int ypos, xpos;
     int nthcoin;
     int score;
+    int retry;
     int turn; 
     int i;
     int key, choice;
@@ -183,6 +240,8 @@ main(int argc, char *argv[])
 
         score = 0;
 
+        retry = 0;
+
         for (turn=0; turn<turns; ++turn)
         {
             clear();
@@ -201,51 +260,18 @@ main(int argc, char *argv[])
 
             display_turn(yturn, xturn, turn);
 
-            /* movement */
-            key = getch();
-            switch (key)
-            {
-            // h & a
-            case 104:
-            case 97:
-                xpos -= xstep;
-                break;
-            // j & s
-            case 106:
-            case 115:
-                ypos += ystep;
-                break;
-            // k & w
-            case 107:
-            case 119:
-                ypos -= ystep;
-                break;
-            // l & d
-            case 108:
-            case 100:
-                xpos += xstep;
-                break;
-            // q
-            case 113:
-                endwin();
-                exit(0);
-            }
+            movement(ystep, xstep, &ypos, &xpos, &retry);
 
-            /* movement bounds */
-            if (ypos < 0)
-                ypos = 0;
+            if (retry)
+                break;
 
-            if (xpos < 0)
-                xpos = 0;
-
-            if (ypos > ystep * (GRID - 1))
-                ypos = ystep * (GRID - 1);
-
-            if (xpos > xstep * (GRID - 1))
-                xpos = xstep * (GRID - 1);
+            enforce_bounds(ystep, xstep, &ypos, &xpos);
 
             score = collect(ypos, xpos, nthcoin, coins, coinvalidity, score);
         }
+
+        if (retry)
+            continue;
 
         clear();
 
