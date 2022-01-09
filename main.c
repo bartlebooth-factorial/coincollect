@@ -4,9 +4,8 @@
 #include <time.h>
 
 /*
- * add 2 coins per round
+ * add avg score
  * add magic character
- * add avg score (static variable)
  */
 
 void curses_init(void);
@@ -26,7 +25,7 @@ main(int argc, char *argv[])
     int ypos, xpos;
     int ycoin, xcoin;
     int yscore, xscore;
-    int yround, xround;
+    int yturn, xturn;
     int ystep, xstep;
     int score;
     int backscore;
@@ -38,10 +37,14 @@ main(int argc, char *argv[])
     int i;
     int newcoins, coinsperturn;
     int newycoin, newxcoin;
-    int round, rounds;
+    int turn, turns;
     int matches;
+    int games, totalscore;
 
     curses_init();
+
+    games = 0;
+    totalscore = 0;
 
     while (true)
     {
@@ -61,16 +64,16 @@ main(int argc, char *argv[])
         yscore = 1;
         xscore = 80;
 
-        yround = 26;
-        xround = 80;
+        yturn = 26;
+        xturn = 80;
 
-        rounds = 40;
+        turns = 40;
 
         coinsperturn = 2;
 
         score = 0;
 
-        for (round=0; round<rounds; ++round)
+        for (turn=0; turn<turns; ++turn)
         {
             clear();
 
@@ -123,9 +126,9 @@ main(int argc, char *argv[])
             move(yscore, xscore);
             printw("Score = %d", score);
 
-            /* display round number */
-            move(yround, xround);
-            printw("move %d of 40", round);
+            /* display turn number */
+            move(yturn, xturn);
+            printw("turn %d of 40", turn);
 
             /* handle input */
             key = getch();
@@ -187,9 +190,17 @@ main(int argc, char *argv[])
 
         clear();
 
+        ++games;
+        totalscore += score;
+
         move(12, 44);
         attron(A_STANDOUT);
         printw("Score = %d", score);
+        if (games>1)
+        {
+            move(16, 44);
+            printw("Average score = %d", totalscore/games);
+        }
         attroff(A_STANDOUT);
 
         choice = getch();
