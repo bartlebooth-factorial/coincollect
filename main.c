@@ -6,17 +6,18 @@
 #define GRID 8
 
 /*
- * add magic character
+ * add unlocking condition for magic character
  */
 
 void curses_init(void);
-void display_player(int ypos, int xpos);
+void display_player(int ypos, int xpos, int magic);
 void add_coin(int ystep, int xstep, int nthcoin, int *coins, int *coinvalidity);
 void display_coins(int ypos, int xpos, int nthcoin, int *coins, int *coinvalidity);
 void display_midgame_score(int yscore, int xscore, int score);
 void display_turn(int yturn, int xturn, int turn);
-void movement(int ystep, int xstep, int *ypos, int *xpos, int *retry);
-void enforce_bounds(int ystep, int xstep, int *ypos, int *xpos);
+void movement(int ystep, int xstep, int *ypos, int *xpos, int magic, int *retry);
+void normal_bounds(int ystep, int xstep, int *ypos, int *xpos);
+void magic_bounds(int ystep, int xstep, int *ypos, int *xpos);
 int collect(int ypos, int xpos, int nthcoin, int *coins, int * coinvalidity, int score);
 void display_score(int score, int totalscore, int games);
 
@@ -30,9 +31,12 @@ curses_init(void)
 }
 
 void
-display_player(int ypos, int xpos)
+display_player(int ypos, int xpos, int magic)
 {
-    mvaddch(ypos, xpos, '&');
+    if (magic)
+        mvaddch(ypos, xpos, 'M');
+    else
+        mvaddch(ypos, xpos, '&');
 }
 
 void
@@ -102,7 +106,7 @@ display_turn(int yturn, int xturn, int turn)
 }
 
 void
-movement(int ystep, int xstep, int *ypos, int *xpos, int *retry)
+movement(int ystep, int xstep, int *ypos, int *xpos, int magic, int *retry)
 {
     int key;
 
@@ -129,6 +133,14 @@ movement(int ystep, int xstep, int *ypos, int *xpos, int *retry)
     case 100:
         *xpos += xstep;
         break;
+    // space
+    case 32:
+        if (magic)
+        {
+            *ypos = ystep * (GRID / 2);
+            *xpos = xstep * (GRID / 2);
+        }
+        break;
     // r
     case 114:
         *retry = 1;
@@ -141,7 +153,7 @@ movement(int ystep, int xstep, int *ypos, int *xpos, int *retry)
 }
 
 void
-enforce_bounds(int ystep, int xstep, int *ypos, int *xpos)
+normal_bounds(int ystep, int xstep, int *ypos, int *xpos)
 {
     if (*ypos < 0)
         *ypos = 0;
@@ -154,6 +166,22 @@ enforce_bounds(int ystep, int xstep, int *ypos, int *xpos)
 
     if (*xpos > xstep * (GRID - 1))
         *xpos = xstep * (GRID - 1);
+}
+
+void
+magic_bounds(int ystep, int xstep, int *ypos, int *xpos)
+{
+    if (*ypos < 0)
+        *ypos = ystep * (GRID - 1);
+
+    if (*xpos < 0)
+        *xpos = xstep * (GRID - 1);
+
+    if (*ypos > ystep * (GRID - 1))
+        *ypos = 0;
+
+    if (*xpos > xstep * (GRID - 1))
+        *xpos = 0;
 }
 
 int
@@ -204,6 +232,7 @@ main(int argc, char *argv[])
     int nthcoin;
     int score;
     int retry;
+    int magic;
     int turn; 
     int i;
     int key, choice;
@@ -242,11 +271,13 @@ main(int argc, char *argv[])
 
         retry = 0;
 
+        magic = 1;
+
         for (turn=0; turn<turns; ++turn)
         {
             clear();
 
-            display_player(ypos, xpos);
+            display_player(ypos, xpos, magic);
 
             for (i=0; i<coinsperturn; ++i)
             {
@@ -260,12 +291,15 @@ main(int argc, char *argv[])
 
             display_turn(yturn, xturn, turn);
 
-            movement(ystep, xstep, &ypos, &xpos, &retry);
+            movement(ystep, xstep, &ypos, &xpos, magic, &retry);
 
             if (retry)
                 break;
 
-            enforce_bounds(ystep, xstep, &ypos, &xpos);
+            if (magic)
+                magic_bounds(ystep, xstep, &ypos, &xpos);
+            else
+                normal_bounds(ystep, xstep, &ypos, &xpos);
 
             score = collect(ypos, xpos, nthcoin, coins, coinvalidity, score);
         }
