@@ -14,10 +14,6 @@
 #define COINS_PER_TURN 2
 #define UNLOCK_MAGIC 30
 
-/*
- * done
- */
-
 void curses_init(void);
 void display_borders(void);
 void display_player(int ypos, int xpos, int magic);
