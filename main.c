@@ -3,8 +3,9 @@
 #include <stdio.h>
 #include <time.h>
 
+#define GRID 8
+
 /*
- * finish splitting up main function
  * add mid-round retry
  * add magic character
  */
@@ -44,8 +45,8 @@ add_coin(int ystep, int xstep, int nthcoin, int *coins, int *coinvalidity)
 
     while (true)
     {
-        newycoin = ystep * (random() % 8); /* must be a multiple of ystep */
-        newxcoin = xstep * (random() % 8); /* must be a multiple of xstep */
+        newycoin = ystep * ((random() % GRID) + 1);
+        newxcoin = xstep * ((random() % GRID + 1));
 
         matches = 0;
         for (i=0; i<=nthcoin; i+=2)
@@ -80,7 +81,6 @@ display_coins(int ypos, int xpos, int nthcoin, int *coins, int *coinvalidity)
         xcoin = coins[i+1];
         valid = coinvalidity[i/2];
 
-        /* print coin only when user is not on the coin's position */
         if ((ypos != ycoin || xpos != xcoin) && valid)
             mvaddch(ycoin, xcoin, '*');
     }
@@ -139,52 +139,47 @@ display_score(int score, int totalscore, int games)
 int
 main(int argc, char *argv[])
 {
-    int ypos, xpos;
-    int ycoin, xcoin;
-    int yscore, xscore;
-    int yturn, xturn;
+    int coins[160], coinvalidity[80];
     int ystep, xstep;
-    int score;
-    int backscore;
-    int key, choice;
-    int coins[160];
-    int coinvalidity[80];
-    int valid;
-    int nthcoin;
-    int i;
-    int coinsperturn;
-    int turn, turns;
+    int yscore, xscore, yturn, xturn;
+    int turns, coinsperturn;
     int games, totalscore;
+    int ypos, xpos;
+    int nthcoin;
+    int score;
+    int turn; 
+    int i;
+    int key, choice;
 
-    curses_init();
+    srandom(time(NULL));
+
+    ystep = 3;
+    xstep = 6;
+
+    yscore = 1;
+    xscore = 80;
+
+    yturn = 25;
+    xturn = 80;
+
+    turns = 40;
+
+    coinsperturn = 2;
 
     games = 0;
     totalscore = 0;
 
+    curses_init();
+
     while (true)
     {
-        srandom(time(NULL));
-
-        ystep = 3;
-        xstep = 6;
-
-        ypos = ystep * 4;
-        xpos = xstep * 4;
+        ypos = ystep * (GRID / 2);
+        xpos = xstep * (GRID / 2);
 
         nthcoin = -2; /* initial offset */
 
         for (i=0; i<40; ++i)
             coinvalidity[i] = 1;
-
-        yscore = 1;
-        xscore = 80;
-
-        yturn = 26;
-        xturn = 80;
-
-        turns = 40;
-
-        coinsperturn = 2;
 
         score = 0;
 
@@ -206,7 +201,7 @@ main(int argc, char *argv[])
 
             display_turn(yturn, xturn, turn);
 
-            /* handle input */
+            /* movement */
             key = getch();
             switch (key)
             {
@@ -236,20 +231,19 @@ main(int argc, char *argv[])
                 exit(0);
             }
 
-            /* enforce movement bounds */
-            if (ypos < 0)
-                ypos = 0;
+            /* movement bounds */
+            if (ypos < ystep)
+                ypos = ystep;
 
-            if (xpos < 0)
-                xpos = 0;
+            if (xpos < xstep)
+                xpos = xstep;
 
-            if (ypos > ystep * 8)
-                ypos = ystep * 8;
+            if (ypos > ystep * GRID)
+                ypos = ystep * GRID;
 
-            if (xpos > xstep * 8)
-                xpos = xstep * 8;
+            if (xpos > xstep * GRID)
+                xpos = xstep * GRID;
 
-            /* check for coin collecion */
             score = collect(ypos, xpos, nthcoin, coins, coinvalidity, score);
         }
 
