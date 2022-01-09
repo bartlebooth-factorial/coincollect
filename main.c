@@ -113,9 +113,7 @@ int main()
 
                 /* print coin only when user is not on the coin's position */
                 if ((ypos != ycoin || xpos != xcoin) && valid)
-                {
                     mvaddch(ycoin, xcoin, '*');
-                }
             }
 
             /* display score */
