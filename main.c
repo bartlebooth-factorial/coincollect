@@ -57,7 +57,7 @@ int main()
         ypos = ystep * 4;
         xpos = xstep * 4;
 
-        nthcoin = 0;
+        nthcoin = -2; /* initial offset */
 
         for (i=0; i<40; i++)
             coinvalidity[i] = 1;
@@ -65,7 +65,7 @@ int main()
         yscore = 1;
         xscore = 80;
 
-        yround = 4;
+        yround = 26;
         xround = 80;
 
         rounds = 40;
