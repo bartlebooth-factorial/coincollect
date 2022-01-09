@@ -42,25 +42,11 @@ main(int argc, char *argv[])
 
     curses_init();
 
-    /*
-     * SCREEN:
-     * - - - - - - - - - - - - - - - - - -
-     * [top left]            [top right] -
-     *  y=0, x=0    +x   +x              -
-     *                                   -
-     * +y                                -
-     *                                   -
-     * +y                                -
-     *                      y=max, x=max -
-     * [bot left]           [bot right]  -
-     * - - - - - - - - - - - - - - - - - -
-     */
-
     while (true)
     {
         srandom(time(NULL));
 
-        ystep = 4;
+        ystep = 3;
         xstep = 6;
 
         ypos = ystep * 4;
@@ -101,8 +87,9 @@ main(int argc, char *argv[])
                 {
                     ycoin = coins[i];
                     xcoin = coins[i+1];
+                    valid = coinvalidity[i/2];
 
-                    if (ycoin==newycoin && xcoin==newxcoin)
+                    if (ycoin==newycoin && xcoin==newxcoin && valid)
                         matches += 1;
                 }
 
@@ -112,6 +99,7 @@ main(int argc, char *argv[])
 
             coins[nthcoin] = newycoin;
             coins[nthcoin+1] = newxcoin;
+            coinvalidity[nthcoin/2] = 1;
 
             /* display coins */
             for (i=0; i<=nthcoin; i+=2)
