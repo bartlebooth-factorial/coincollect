@@ -4,11 +4,18 @@
 #include <time.h>
 
 /*
+ * finish splitting up main function
+ * add mid-round retry
  * add magic character
- * split up main function
  */
 
 void curses_init(void);
+void display_player(int ypos, int xpos);
+void add_coin(int ystep, int xstep, int nthcoin, int *coins, int *coinvalidity);
+void display_coins(int ypos, int xpos, int nthcoin, int *coins, int *coinvalidity);
+void display_midgame_score(int yscore, int xscore, int score);
+void display_turn(int yturn, int xturn, int turn);
+int collect(int ypos, int xpos, int nthcoin, int *coins, int * coinvalidity, int score);
 void display_score(int score, int totalscore, int games);
 
 void
@@ -18,6 +25,101 @@ curses_init(void)
     cbreak();
     noecho();
     curs_set(0);
+}
+
+void
+display_player(int ypos, int xpos)
+{
+    mvaddch(ypos, xpos, '&');
+}
+
+void
+add_coin(int ystep, int xstep, int nthcoin, int *coins, int *coinvalidity)
+{
+    int newycoin, newxcoin;
+    int ycoin, xcoin;
+    int valid;
+    int matches;
+    int i;
+
+    while (true)
+    {
+        newycoin = ystep * (random() % 8); /* must be a multiple of ystep */
+        newxcoin = xstep * (random() % 8); /* must be a multiple of xstep */
+
+        matches = 0;
+        for (i=0; i<=nthcoin; i+=2)
+        {
+            ycoin = coins[i];
+            xcoin = coins[i+1];
+            valid = coinvalidity[i/2];
+
+            if (ycoin==newycoin && xcoin==newxcoin && valid)
+                matches += 1;
+        }
+
+        if (matches==0)
+            break;
+    }
+
+    coins[nthcoin] = newycoin;
+    coins[nthcoin+1] = newxcoin;
+    coinvalidity[nthcoin/2] = 1;
+}
+
+void
+display_coins(int ypos, int xpos, int nthcoin, int *coins, int *coinvalidity)
+{
+    int ycoin, xcoin;
+    int valid;
+    int i;
+
+    for (i=0; i<=nthcoin; i+=2)
+    {
+        ycoin = coins[i];
+        xcoin = coins[i+1];
+        valid = coinvalidity[i/2];
+
+        /* print coin only when user is not on the coin's position */
+        if ((ypos != ycoin || xpos != xcoin) && valid)
+            mvaddch(ycoin, xcoin, '*');
+    }
+}
+
+void
+display_midgame_score(int yscore, int xscore, int score)
+{
+    move(yscore, xscore);
+    printw("Score = %d", score);
+}
+
+void
+display_turn(int yturn, int xturn, int turn)
+{
+    move(yturn, xturn);
+    printw("turn %d of 40", turn);
+}
+
+int
+collect(int ypos, int xpos, int nthcoin, int *coins, int * coinvalidity, int score)
+{
+    int ycoin, xcoin;
+    int valid;
+    int i;
+
+    for (i=0; i<=nthcoin; i+=2)
+    {
+        ycoin = coins[i];
+        xcoin = coins[i+1];
+        valid = coinvalidity[i/2];
+
+        if (ypos==ycoin && xpos==xcoin && valid)
+        {
+            ++score;
+            coinvalidity[i/2] = 0;
+        }
+    }
+    return score;
 }
 
 void
@@ -50,10 +152,8 @@ main(int argc, char *argv[])
     int valid;
     int nthcoin;
     int i;
-    int newcoins, coinsperturn;
-    int newycoin, newxcoin;
+    int coinsperturn;
     int turn, turns;
-    int matches;
     int games, totalscore;
 
     curses_init();
@@ -92,58 +192,19 @@ main(int argc, char *argv[])
         {
             clear();
 
-            /* display player */
-            mvaddch(ypos, xpos, '&');
+            display_player(ypos, xpos);
 
-            /* add coins */
-            for (newcoins=0; newcoins<coinsperturn; ++newcoins)
+            for (i=0; i<coinsperturn; ++i)
             {
-                nthcoin += 2;
-
-                while (true)
-                {
-                    newycoin = ystep * (random() % 8); /* must be a multiple of ystep */
-                    newxcoin = xstep * (random() % 8); /* must be a multiple of xstep */
-
-                    matches = 0;
-                    for (i=0; i<=nthcoin; i+=2)
-                    {
-                        ycoin = coins[i];
-                        xcoin = coins[i+1];
-                        valid = coinvalidity[i/2];
-
-                        if (ycoin==newycoin && xcoin==newxcoin && valid)
-                            matches += 1;
-                    }
-
-                    if (matches==0)
-                        break;
-                }
-
-                coins[nthcoin] = newycoin;
-                coins[nthcoin+1] = newxcoin;
-                coinvalidity[nthcoin/2] = 1;
+                nthcoin+=2;
+                add_coin(ystep, xstep, nthcoin, coins, coinvalidity);
             }
 
-            /* display coins */
-            for (i=0; i<=nthcoin; i+=2)
-            {
-                ycoin = coins[i];
-                xcoin = coins[i+1];
-                valid = coinvalidity[i/2];
+            display_coins(ypos, xpos, nthcoin, coins, coinvalidity);
 
-                /* print coin only when user is not on the coin's position */
-                if ((ypos != ycoin || xpos != xcoin) && valid)
-                    mvaddch(ycoin, xcoin, '*');
-            }
+            display_midgame_score(yscore, xscore, score);
 
-            /* display score */
-            move(yscore, xscore);
-            printw("Score = %d", score);
-
-            /* display turn number */
-            move(yturn, xturn);
-            printw("turn %d of 40", turn);
+            display_turn(yturn, xturn, turn);
 
             /* handle input */
             key = getch();
@@ -189,18 +250,7 @@ main(int argc, char *argv[])
                 xpos = xstep * 8;
 
             /* check for coin collecion */
-            for (i=0; i<=nthcoin; i+=2)
-            {
-                ycoin = coins[i];
-                xcoin = coins[i+1];
-                valid = coinvalidity[i/2];
-
-                if (ypos==ycoin && xpos==xcoin && valid)
-                {
-                    ++score;
-                    coinvalidity[i/2] = 0;
-                }
-            }
+            score = collect(ypos, xpos, nthcoin, coins, coinvalidity, score);
         }
 
         clear();
