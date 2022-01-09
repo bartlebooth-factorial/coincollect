@@ -4,11 +4,12 @@
 #include <time.h>
 
 /*
- * add avg score
  * add magic character
+ * split up main function
  */
 
 void curses_init(void);
+void display_score(int score, int totalscore, int games);
 
 void
 curses_init(void)
@@ -17,6 +18,20 @@ curses_init(void)
     cbreak();
     noecho();
     curs_set(0);
+}
+
+void
+display_score(int score, int totalscore, int games)
+{
+    move(12, 44);
+    attron(A_STANDOUT);
+    printw("Score = %d", score);
+    if (games>1)
+    {
+        move(16, 44);
+        printw("Average score = %d", totalscore/games);
+    }
+    attroff(A_STANDOUT);
 }
 
 int
@@ -190,18 +205,10 @@ main(int argc, char *argv[])
 
         clear();
 
-        ++games;
         totalscore += score;
+        ++games;
 
-        move(12, 44);
-        attron(A_STANDOUT);
-        printw("Score = %d", score);
-        if (games>1)
-        {
-            move(16, 44);
-            printw("Average score = %d", totalscore/games);
-        }
-        attroff(A_STANDOUT);
+        display_score(score, totalscore, games);
 
         choice = getch();
         // q to quit
