@@ -6,20 +6,26 @@
 /*
  * enable new coins to take the position of collected coins
  * add 2 coins per round
+ * add magic character
  */
 
 int main()
 {
-    int ypos, xpos, ycoin, xcoin, yscore, xscore;
-    int ystep, xstep, score;
-    int key, choice;
+    int ypos, xpos;
+    int ycoin, xcoin;
+    int yscore, xscore;
+    int yround, xround;
+    int ystep, xstep;
+    int score;
     int backscore;
+    int key, choice;
     int coins[80];
     int coinvalidity[40];
     int valid;
-    int nthcoin, i;
+    int nthcoin;
+    int i;
     int newycoin, newxcoin;
-    int rounds;
+    int round, rounds;
     int matches;
 
     initscr();
@@ -59,9 +65,14 @@ int main()
         yscore = 1;
         xscore = 80;
 
+        yround = 4;
+        xround = 80;
+
+        rounds = 40;
+
         score = 0;
 
-        for (rounds=0; rounds<40; ++rounds)
+        for (round=0; round<rounds; ++round)
         {
             clear();
 
@@ -111,6 +122,10 @@ int main()
             move(yscore, xscore);
             printw("Score = %d", score);
 
+            /* display round number */
+            move(yround, xround);
+            printw("move %d of 40", round);
+
             /* handle input */
             key = getch();
             switch (key)
@@ -141,6 +156,20 @@ int main()
                 exit(0);
             }
 
+            /* enforce movement bounds */
+            if (ypos < 0)
+                ypos = 0;
+
+            if (xpos < 0)
+                xpos = 0;
+
+            if (ypos > ystep * 8)
+                ypos = ystep * 8;
+
+            if (xpos > xstep * 8)
+                xpos = xstep * 8;
+
+            /* check for coin collecion */
             for (i=0; i<=nthcoin; i+=2) {
                 ycoin = coins[i];
                 xcoin = coins[i+1];
@@ -166,9 +195,8 @@ int main()
         {
         // q to quit
         case 113:
-            break;
+            endwin();
+            exit(0);
         }
     }
-    endwin();
-    exit(0);
 }
