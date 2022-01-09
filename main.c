@@ -36,11 +36,13 @@ void display_borders(int ystep, int xstep)
 {
     int i;
 
-    for (i=0; i<GRID; i+=xstep)
+    for (i=0; i<(GRID*xstep); i+=xstep)
         mvaddch(ystep * GRID, i, '-');
 
-    for (i=0; i<GRID; i+=ystep)
+    for (i=0; i<(GRID*ystep); i+=ystep)
         mvaddch(i, xstep * GRID, '|');
+
+    mvaddch(GRID*ystep, GRID*xstep, ';');
 }
 
 void
