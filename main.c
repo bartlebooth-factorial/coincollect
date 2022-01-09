@@ -6,7 +6,7 @@
 #define printcoin() attron(A_BOLD); printw("*"); attroff(A_BOLD)
 
 /*
- * disallow coins from spawning atop other coins
+ * fix score breaking on final turn
  */
 
 int main()
@@ -14,9 +14,12 @@ int main()
     int ypos, xpos, ycoin, xcoin, yscore, xscore;
     int ystep, xstep, score, ch;
     int coins[80];
+    int coinvalidity[40];
+    int valid;
     int nthcoin, i;
     int newycoin, newxcoin;
     int rounds;
+    int found, matches;
 
     srandom(time(NULL));
 
@@ -39,16 +42,19 @@ int main()
      * - - - - - - - - - - - - - - - - - -
      */
 
-    ypos = 15;
-    xpos = 30;
+    ypos = 16;
+    xpos = 24;
 
-    ycoin = 5;
-    xcoin = 10;
+    //ycoin = 5;
+    //xcoin = 10;
 
-    coins[0] = ycoin;
-    coins[1] = xcoin;
+    //coins[0] = ycoin;
+    //coins[1] = xcoin;
 
     nthcoin = 0;
+
+    for (i=0; i<40; i++)
+        coinvalidity[i] = 1;
 
     move(ycoin, xcoin);
     printcoin();
@@ -56,8 +62,8 @@ int main()
     yscore = 1;
     xscore = 80;
 
-    ystep = 5;
-    xstep = 10;
+    ystep = 4;
+    xstep = 6;
 
     score = 0;
 
@@ -65,28 +71,53 @@ int main()
     {
         clear();
 
-        move(ypos, xpos);
-        printw("&");
+        //move(ypos, xpos);
+        //printw("&");
+
+        mvaddch(ypos, xpos, '&');
 
         /* add coin */
-        newycoin = 5 * (random() % 8); /* must be a multiple of 5 */
-        newxcoin = 10 * (random() % 8); /* must be a multiple of 10 */
-
         nthcoin += 2;
+
+        while (true)
+        {
+            newycoin = 4 * (random() % 8); /* must be a multiple of 5 */
+            newxcoin = 6 * (random() % 8); /* must be a multiple of 10 */
+
+            matches = 0;
+            for (i=0; i<=nthcoin; i+=2)
+            {
+                ycoin = coins[i];
+                xcoin = coins[i+1];
+
+                if (ycoin==newycoin && xcoin==newxcoin)
+                    matches += 1;
+            }
+
+            if (matches==0)
+                break;
+        }
+
+        //move(0, 0);
+        //printw("%d", newycoin);
+        //move(0, 4);
+        //printw("%d", newxcoin);
 
         coins[nthcoin] = newycoin;
         coins[nthcoin+1] = newxcoin;
 
         /* display coins */
-        for (i=0; i<=nthcoin; i+=2) {
-
+        for (i=0; i<=nthcoin; i+=2)
+        {
             ycoin = coins[i];
             xcoin = coins[i+1];
+            valid = coinvalidity[i/2];
 
             /* print coin only when user is not on the coin's position */
-            if (ypos != ycoin || xpos != xcoin) {
-                move(ycoin, xcoin);
-                printcoin();
+            if ((ypos != ycoin || xpos != xcoin) && valid)
+            {
+                mvaddch(ycoin, xcoin, '*');
+                //printcoin();
             }
         }
 
@@ -123,14 +154,18 @@ int main()
         for (i=0; i<=nthcoin; i+=2) {
             ycoin = coins[i];
             xcoin = coins[i+1];
+            valid = coinvalidity[i/2];
 
-            if (ypos==ycoin && xpos==xcoin)
+            if (ypos==ycoin && xpos==xcoin && valid)
+            {
                 ++score;
+                coinvalidity[i/2] = 0;
+            }
         }
     }
 
     clear();
-    move(10, 30);
+    move(12, 44);
     printw("Score = %d", score);
     getch();
     endwin();
