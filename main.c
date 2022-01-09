@@ -9,7 +9,19 @@
  * add magic character
  */
 
-int main()
+void curses_init(void);
+
+void
+curses_init(void)
+{
+    initscr();
+    cbreak();
+    noecho();
+    curs_set(0);
+}
+
+int
+main(int argc, char *argv[])
 {
     int ypos, xpos;
     int ycoin, xcoin;
@@ -28,10 +40,7 @@ int main()
     int round, rounds;
     int matches;
 
-    initscr();
-    cbreak();
-    noecho();
-    curs_set(0);
+    curses_init();
 
     /*
      * SCREEN:
@@ -59,7 +68,7 @@ int main()
 
         nthcoin = -2; /* initial offset */
 
-        for (i=0; i<40; i++)
+        for (i=0; i<40; ++i)
             coinvalidity[i] = 1;
 
         yscore = 1;
@@ -168,7 +177,8 @@ int main()
                 xpos = xstep * 8;
 
             /* check for coin collecion */
-            for (i=0; i<=nthcoin; i+=2) {
+            for (i=0; i<=nthcoin; i+=2)
+            {
                 ycoin = coins[i];
                 xcoin = coins[i+1];
                 valid = coinvalidity[i/2];
@@ -189,12 +199,12 @@ int main()
         attroff(A_STANDOUT);
 
         choice = getch();
-        switch(choice)
-        {
         // q to quit
-        case 113:
+        if (choice==113)
+        {
             endwin();
             exit(0);
         }
     }
 }
+
