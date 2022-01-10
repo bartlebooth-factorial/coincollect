@@ -36,7 +36,8 @@ curses_init(void)
     curs_set(0);
 }
 
-void display_borders(void)
+void
+display_borders(void)
 {
     int i;
 
@@ -323,7 +324,7 @@ main(int argc, char *argv[])
         display_score(score, totalscore, games);
 
         choice = getch();
-        // q to quit
+        /* q to quit */
         if (choice==113)
         {
             endwin();
