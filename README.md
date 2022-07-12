@@ -10,7 +10,7 @@ turns the game ends, and the player's score is displayed. Players can continue
 and play multiple rounds, with their round-score and average-score being displayed
 at the end of each round.
 
-If the player is able to collect 30 coins by the end of the round, they become
+If the player is able to collect 30 coins by the end of a round, they become
 the magician (M), who is able to move through walls as if the grid were a torus
 and teleport to the center of the grid at any time, enabling the player to reach
 higher scores than with the basic character.
