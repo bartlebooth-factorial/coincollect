@@ -254,6 +254,12 @@ main(int argc, char *argv[])
     int i;
     int key, choice;
 
+    for (i=0; i<80; i++) {
+	    coins[2*i] = -1;
+	    coins[2*i + 1] = -1;
+	    coinvalidity[i] = -1;
+    }
+
     srandom(time(NULL));
 
     magic = 0;
