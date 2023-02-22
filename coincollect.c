@@ -259,8 +259,6 @@ main(int argc, char *argv[])
 	    coinvalidity[i] = -1;
     }
 
-    srandom(time(NULL));
-
     magic = 0;
 
     games = 0;
