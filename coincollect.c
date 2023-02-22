@@ -1,7 +1,6 @@
 #include <curses.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <time.h>
 
 #define GRID 8
 #define YSTEP 3
@@ -70,8 +69,8 @@ add_coin(int nthcoin, int *coins, int *coinvalidity)
 
     while (true)
     {
-        newycoin = YSTEP * (random() % GRID);
-        newxcoin = XSTEP * (random() % GRID);
+        newycoin = YSTEP * arc4random_uniform(GRID);
+        newxcoin = XSTEP * arc4random_uniform(GRID);
 
         matches = 0;
         for (i=0; i<=nthcoin; i+=2)

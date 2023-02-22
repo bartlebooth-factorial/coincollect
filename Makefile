@@ -9,3 +9,5 @@ uninstall:
 
 clean:
 	rm coincollect
+
+.PHONY: coincollect
