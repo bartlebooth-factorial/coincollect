@@ -234,7 +234,8 @@ display_score(int score, int totalscore, int games)
     if (games>1)
     {
         move(16, 44);
-        printw("Average score = %.2f", (double) totalscore / (double) games);
+        printw("Average score = %.2f (after %d games played)",
+	       (double) totalscore / (double) games, games);
     }
     attroff(A_STANDOUT);
 }
