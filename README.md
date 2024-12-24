@@ -38,5 +38,5 @@ required for compilation.
 # Contributing
 
 All questions, comments, and pull requests are appreciated!
-Email me at ericmfrederickson@gmail.com to get in touch.
+Email me at ericfrederickson68@gmail.com to get in touch.
 
