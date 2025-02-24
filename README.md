@@ -18,7 +18,7 @@ higher scores than with the basic character.
 # Installation
 
 ```sh
-git clone https://github.com/bartlebooth-factorial/coincollect
+git clone https://github.com/emfred-dot-com/coincollect
 cd coincollect
 make
 sudo make install
